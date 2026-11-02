@@ -13,6 +13,8 @@ RUN python -m compileall -q /deps /app
 
 # Python + stdlib + every shared library (incl. the ELF loader) that the
 # interpreter and the C extensions link against. Works for x86_64 and arm64.
+# `ldd f1 f2 ...` prints "path:" header lines (hence the `!~ /:$/`), and libs
+# vendored under /deps are already copied by the `COPY /deps` below.
 RUN mkdir -p /rootfs/tmp && chmod 1777 /rootfs/tmp \
  && cp -a --parents /usr/local/bin/python3.12 /usr/local/lib/python3.12 /usr/local/lib/libpython3.12.so* /rootfs \
  && rm -rf /rootfs/usr/local/lib/python3.12/site-packages/* \
@@ -22,8 +24,9 @@ RUN mkdir -p /rootfs/tmp && chmod 1777 /rootfs/tmp \
            /rootfs/usr/local/lib/python3.12/turtledemo \
            /rootfs/usr/local/lib/python3.12/ensurepip \
  && { ldd /usr/local/bin/python3.12; find /usr/local/lib/python3.12/lib-dynload /deps -name '*.so*' -exec ldd {} +; } 2>/dev/null \
-    | awk '$3 ~ /^\// {print $3} $1 ~ /^\// {print $1}' | sort -u \
-    | xargs -I{} cp -L --parents {} /rootfs
+    | awk '$3 ~ /^\// {print $3} $1 ~ /^\// && $1 !~ /:$/ {print $1}' \
+    | grep -v '^/deps/' | sort -u \
+    | xargs -r -I{} cp -L --parents {} /rootfs
 
 # Stage 2: nothing but the files above. No shell, no package manager.
 FROM scratch
