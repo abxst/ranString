@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ranString</title>
+<link rel="stylesheet" href="/static/vendor/bootstrap.min.css">
+<script>
+  // Follow the OS colour scheme (Bootstrap 5.3 colour modes).
+  const dark = matchMedia("(prefers-color-scheme: dark)");
+  const applyTheme = () => document.documentElement.setAttribute("data-bs-theme", dark.matches ? "dark" : "light");
+  applyTheme();
+  dark.addEventListener("change", applyTheme);
+</script>
+<style>
+  .result-pre { white-space: pre-wrap; word-break: break-all; font-size: .85rem; }
+</style>
+</head>
+<body>
+<main class="container py-4" style="max-width: 760px">
+  <h1 class="h4 mb-3">ranString</h1>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label for="search" class="form-label">Tìm thuật toán</label>
+          <input id="search" type="search" class="form-control" placeholder="sha, bcrypt, aes...">
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="sort" class="form-label">Sắp xếp</label>
+          <select id="sort" class="form-select">
+            <option value="group">Theo nhóm (mặc định)</option>
+            <option value="asc">Độ phức tạp: thấp → cao</option>
+            <option value="desc">Độ phức tạp: cao → thấp</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="algo" class="form-label">Thuật toán</label>
+          <select id="algo" class="form-select"></select>
+        </div>
+        <div class="col-12 col-md-4">
+          <label for="length" class="form-label">Độ dài chuỗi ngẫu nhiên</label>
+          <input id="length" type="number" class="form-control" min="1" max="4096" value="16">
+        </div>
+        <div id="roundsBox" class="col-12 col-md-4 d-none">
+          <label id="roundsLabel" for="rounds" class="form-label">Số vòng</label>
+          <input id="rounds" type="number" class="form-control">
+        </div>
+        <div id="sizeBox" class="col-12 col-md-4 d-none">
+          <label id="sizeLabel" for="size" class="form-label">Độ dài output</label>
+          <input id="size" type="number" class="form-control">
+        </div>
+        <div class="col-12">
+          <label for="text" class="form-label">Hoặc nhập text riêng <span class="text-body-secondary">(bỏ trống để dùng chuỗi ngẫu nhiên)</span></label>
+          <textarea id="text" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12 d-grid">
+          <button id="go" class="btn btn-primary">Generate</button>
+        </div>
+      </div>
+      <div id="error" class="alert alert-danger mt-3 mb-0 d-none" role="alert"></div>
+    </div>
+  </div>
+
+  <section id="result" class="card shadow-sm mt-4 d-none" aria-live="polite">
+    <div id="resultBody" class="card-body"></div>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>
