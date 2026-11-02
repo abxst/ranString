@@ -1,8 +1,13 @@
+import os
+from pathlib import Path
+
 from flask import Flask, jsonify, request
 
 from algorithms import catalog, generate
 
-app = Flask(__name__, static_folder="static", static_url_path="/static")
+# Absolute path so it also resolves inside a Nuitka standalone build.
+BASE = Path(__file__).resolve().parent
+app = Flask(__name__, static_folder=str(BASE / "static"), static_url_path="/static")
 
 
 @app.get("/")
@@ -34,6 +39,13 @@ def api_generate():
 
 
 if __name__ == "__main__":
-    import os
-    # 0.0.0.0 inside Docker so the published port works; localhost otherwise.
-    app.run(host=os.environ.get("HOST", "127.0.0.1"), port=5000)
+    from waitress import serve
+
+    # HOST=0.0.0.0 inside Docker so the published port works; localhost otherwise.
+    serve(
+        app,
+        host=os.environ.get("HOST", "127.0.0.1"),
+        port=int(os.environ.get("PORT", "5000")),
+        threads=4,
+        max_request_body_size=256 * 1024,
+    )
